@@ -1,2 +1,2 @@
-# Gypsum
-Gypsum: Unobsidian
+# Graphium Sarpedon
+Graphium Sarpedon: the Notes
