@@ -14,4 +14,8 @@ Graphium Sarpedon: the Notes
   well, for now ill try cpp
 
   15:25 did try raylib. well, this is funny, but over pixellery
-  <img width="402" height="319" alt="screen-record-1784982316595" src="https://github.com/user-attachments/assets/c9e27741-a2e9-43a7-980c-7da6d688a170" />
+  <img width="402" height="319" alt="screen-record-1784982316595" src="https://github.com/user-attachments/assets/c9e27741-a2e9-43a7-980c-7da6d688a170" /> <br>
+
+  16:24 came up with open gl
+  <img width="789" height="540" alt="screen-record-1784985877514" src="https://github.com/user-attachments/assets/b92d79f8-6e67-44fb-8234-99a2d523f607" />
+
