@@ -11,4 +11,4 @@ Graphium Sarpedon: the Notes
 
   so the .exe build bases on c++ vs c# choice, right?
   "for an app tailored for graphics tablets on Windows, C# is overwhelmingly the better choice for almost every developer"
-  well, for now ill try c#
+  well, for now ill try cpp
