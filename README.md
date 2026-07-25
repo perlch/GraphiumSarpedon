@@ -12,3 +12,6 @@ Graphium Sarpedon: the Notes
   so the .exe build bases on c++ vs c# choice, right?
   "for an app tailored for graphics tablets on Windows, C# is overwhelmingly the better choice for almost every developer"
   well, for now ill try cpp
+
+  15:25 did try raylib. well, this is funny, but over pixellery
+  <img width="402" height="319" alt="screen-record-1784982316595" src="https://github.com/user-attachments/assets/c9e27741-a2e9-43a7-980c-7da6d688a170" />
