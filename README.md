@@ -20,4 +20,5 @@ Graphium Sarpedon: the Notes
   <img width="789" height="540" alt="screen-record-1784985877514" src="https://github.com/user-attachments/assets/b92d79f8-6e67-44fb-8234-99a2d523f607" /> <br>
 
   16:37 well as a web developer i can officially say that "growing" can wait and ill try make .exe of graphium via tauri. enough cpp for me, sorry
-
+* the 27th of july
+  working now on the idea of the "nodes" for graphium. learning stuff about pop-up windows, thinking on api's work and how to base local server (python vs nodejs, why not both?)
