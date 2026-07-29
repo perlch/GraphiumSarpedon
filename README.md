@@ -22,3 +22,7 @@ Graphium Sarpedon: the Notes
   16:37 well as a web developer i can officially say that "growing" can wait and ill try make .exe of graphium via tauri. enough cpp for me, sorry
 * the 27th of july
   working now on the idea of the "nodes" for graphium. learning stuff about pop-up windows, thinking on api's work and how to base local server (python vs nodejs, why not both?)
+
+* the 29th of july
+  congrats! now i have a vector-paint! so basically its the main thing. now i need to make a million pannels in visual studio code's style <br>
+  <img width="1280" height="530" alt="image" src="https://github.com/user-attachments/assets/89aaf2c8-89fb-4fad-a670-e46e1cb9e095" />
