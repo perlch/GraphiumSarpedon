@@ -1,4 +1,4 @@
-# Vector Canvas Studio
+# Graphium Sarpedon: Portable Studio
 
 An infinite SVG canvas and vector note-taking web application designed for styluses and graphic tablets, powered by a local Python backend server with multi-window synchronization support.
 
