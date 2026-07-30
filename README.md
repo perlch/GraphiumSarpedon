@@ -35,9 +35,9 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
 
 <hr>
 
-Graphium Sarpedon: the Notes
+# Graphium Sarpedon: the Notes
 
-# here goes the devlog 
+**here goes the devlog**
 * the 25th of july
   the main idea of the app was the portable web version which i could easily create as fronted dev, but it is time for grow bigger
 
