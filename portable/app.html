@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphium Portable v0.0.1</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --panel-bg: rgba(8, 14, 24, 0.92);
+            --panel-border: rgba(0, 210, 255, 0.35);
+            --text-color: #e0f7ff;
+            --accent: #00d2ff;
+            --hover-bg: rgba(0, 210, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        svg#canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: #000000;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .interactive {
+            pointer-events: auto;
+        }
+
+        #top-hover-trigger {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 52px;
+            z-index: 9999;
+            pointer-events: auto;
+        }
+
+        #top-container {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translate(-50%, -26px);
+            opacity: 0.35;
+            filter: blur(1px);
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, filter 0.2s ease;
+            z-index: 10000;
+            background: var(--panel-bg);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--panel-border);
+            border-bottom: 2px solid var(--accent);
+            box-shadow: 0 8px 32px rgba(0, 210, 255, 0.2), inset 0 0 12px rgba(0, 210, 255, 0.08);
+            border-radius: 12px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 95vw;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 210, 255, 0.4) transparent;
+        }
+
+        #top-container::-webkit-scrollbar {
+            height: 3px;
+        }
+        #top-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 210, 255, 0.5);
+            border-radius: 3px;
+        }
+
+        #top-hover-trigger:hover + #top-container,
+        #top-container:hover,
+        #top-container.active-menu {
+            transform: translate(-50%, 0);
+            opacity: 1;
+            filter: blur(0);
+        }
+
+        .menu-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        button, input[type="color"] {
+            background: transparent;
+            border: 1px solid transparent;
+            color: #8ab4f8;
+            padding: 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            min-height: 34px;
+            min-width: 34px;
+            flex-shrink: 0;
+        }
+
+        button:hover {
+            background: var(--hover-bg);
+            border-color: rgba(0, 210, 255, 0.4);
+            color: var(--accent);
+            box-shadow: 0 0 8px rgba(0, 210, 255, 0.25);
+        }
+
+        button.active {
+            background: rgba(0, 210, 255, 0.25);
+            border-color: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(0, 210, 255, 0.45);
+        }
+
+        button svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        #server-btn {
+            font-size: 16px;
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--panel-border);
+            background: rgba(0, 210, 255, 0.1);
+        }
+
+        .color-slot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .color-slot:hover {
+            transform: scale(1.15);
+        }
+
+        .color-slot.active {
+            border-color: #fff;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        #color-picker-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .draggable-window {
+            position: absolute;
+            background: #080e18;
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            pointer-events: auto;
+        }
+
+        .drag-header {
+            background: #04070d;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: var(--accent);
+            cursor: grab;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .drag-header:active {
+            cursor: grabbing;
+        }
+        
+        .header-btn {
+            background: none; 
+            border: none; 
+            padding: 2px 5px; 
+            color: #888; 
+            box-shadow: none; 
+            min-height: unset;
+        }
+        .header-btn:hover { 
+            background: rgba(0, 210, 255, 0.2); 
+            color: #fff; 
+        }
+
+        .hidden { display: none !important; }
+
+        .modal-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: auto; z-index: 100;
+        }
+        .modal {
+            background: #080e18;
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 20px;
+            width: 320px;
+            display: flex; flex-direction: column; gap: 15px;
+            box-shadow: 0 8px 32px rgba(0, 210, 255, 0.2);
+        }
+        .modal input {
+            background: #000; border: 1px solid var(--panel-border); color: #fff; padding: 10px; border-radius: 6px; outline: none;
+        }
+        
+        #file-manager {
+            width: 260px;
+            height: 400px;
+            top: 80px; left: 20px;
+            font-size: 13px;
+        }
+        .fm-toolbar {
+            display: flex; gap: 5px; padding: 8px; border-bottom: 1px solid var(--panel-border); background: #04070d;
+        }
+        .fm-toolbar button { padding: 4px 8px; font-size: 12px; box-shadow: none; min-height: unset; }
+        .fm-content {
+            flex-grow: 1; overflow-y: auto; padding: 10px 5px;
+        }
+        
+        details { padding-left: 10px; margin-top: 2px; }
+        summary { cursor: pointer; padding: 4px; border-radius: 4px; list-style: none; display: flex; align-items: center; gap: 5px; }
+        summary:hover, .file-item:hover { background: var(--hover-bg); }
+        summary::before { content: '▶'; font-size: 10px; margin-right: 4px; color: var(--accent); transition: transform 0.2s; }
+        details[open] > summary::before { transform: rotate(90deg); }
+        .file-item {
+            cursor: pointer; padding: 4px 4px 4px 25px; border-radius: 4px; margin-top: 2px; display: flex; align-items: center; gap: 5px;
+        }
+        .file-item.selected { background: rgba(0, 210, 255, 0.3); color: #fff; }
+
+        .tools-divider { width: 1px; height: 22px; background: var(--panel-border); margin: 0 4px; flex-shrink: 0; }
+
+        .selection-overlay {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 1.5;
+            stroke-dasharray: 4;
+            pointer-events: none;
+        }
+
+        .transform-handle {
+            fill: var(--accent);
+            stroke: #ffffff;
+            stroke-width: 1.5;
+            cursor: nwse-resize;
+            transition: r 0.1s ease;
+        }
+
+        .transform-handle:hover {
+            r: 7;
+            fill: #ffffff;
+            stroke: var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <svg id="canvas" xmlns="http://www.w3.org/2000/svg">
+            <g id="viewport">
+                <g id="svg-layer"></g>
+            </g>
+            <g id="ui-overlay"></g>
+        </svg>
+    </div>
+
+    <div id="ui-layer">
+        
+        <div id="top-hover-trigger"></div>
+
+        <div id="top-container" class="interactive">
+            <button id="server-btn" class="btn" title="Server Connection">🖫</button>
+            
+            <div class="tools-divider"></div>
+
+            <div class="menu-group">
+                <button class="btn tool-btn active" data-tool="brush" title="Brush">
+                    <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/></svg>
+                </button>
+                <button class="btn tool-btn" data-tool="line" title="Line">
+                    <svg viewBox="0 0 24 24"><line x1="5" y1="19" x2="19" y2="5"/></svg>
+                </button>
+                <button class="btn tool-btn" data-tool="circle" title="Circle / Ellipse">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>
+                </button>
+                <button class="btn tool-btn" data-tool="eraser" title="Eraser">
+                    <svg viewBox="0 0 24 24"><path d="M20 20H7L3 16C2 15 2 13 3 12L13 2C14 1 16 1 17 2L21 6C22 7 22 9 21 10L12 19"/><line x1="18" y1="12" x2="11" y2="5"/></svg>
+                </button>
+                <button class="btn tool-btn" data-tool="fill" title="Fill">
+                    <svg viewBox="0 0 24 24"><path d="M19 11l-8-8-8 8.5a2 2 0 0 0 0 2.83l6.17 6.17a2 2 0 0 0 2.83 0L19 11z"/></svg>
+                </button>
+                <button class="btn tool-btn" data-tool="text" title="Text">T</button>
+            </div>
+            
+            <div class="tools-divider"></div>
+            
+            <div class="menu-group">
+                <div class="color-slot active" id="slot-1" style="background: #00d2ff; color: #00d2ff;" title="Primary Color"></div>
+                <div class="color-slot" id="slot-2" style="background: #ff0055; color: #ff0055;" title="Secondary Color"></div>
+                <div class="color-slot" id="slot-3" style="background: linear-gradient(135deg, #f00, #0f0, #00f);" title="Pick Color...">
+                    <input type="color" id="color-picker-input" value="#00d2ff">
+                </div>
+                <button class="btn tool-btn" data-tool="picker" title="Eyedropper">
+                    <svg viewBox="0 0 24 24"><path d="M14.5 2a2.12 2.12 0 0 1 3 0l2.5 2.5a2.12 2.12 0 0 1 0 3L11 16l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+            </div>
+
+            <div class="tools-divider"></div>
+
+            <div class="menu-group">
+                <button class="btn" id="btn-undo" title="Undo (Ctrl+Z)">
+                    <svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>
+                </button>
+                <button class="btn" id="btn-redo" title="Redo (Ctrl+Y)">
+                    <svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13"/></svg>
+                </button>
+                <button class="btn tool-btn" data-tool="select" title="Selection and Transform">
+                    <svg viewBox="0 0 24 24"><path d="M3 3l7 18 3-7 7-3L3 3z"/></svg>
+                </button>
+                <button class="btn tool-btn" data-tool="pan" title="Pan">
+                    <svg viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 0 1 2 2v4a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.8-5.9-2.8L2 14"/></svg>
+                </button>
+            </div>
+
+            <div class="tools-divider"></div>
+            
+            <div class="menu-group">
+                <button class="btn" id="center-btn" title="Center">⌖</button>
+                <button class="btn" id="import-btn" title="Import SVG">📥</button>
+                <button class="btn" id="export-svg" title="Export SVG">💾</button>
+                <button class="btn" id="export-png" title="Export PNG">🖼️</button>
+            </div>
+
+            <div class="tools-divider"></div>
+            
+            <button class="btn" id="popout-toolbar" title="Pop out toolbar into separate window (Alt+Tab)">◳</button>
+        </div>
+
+        <div id="file-manager" class="draggable-window interactive hidden">
+            <div class="drag-header">
+                <span>🖫 File Explorer</span>
+                <button class="header-btn" id="close-fm">✖</button>
+            </div>
+            <div class="fm-toolbar">
+                <button class="btn" id="fm-new-file" title="New File">📄</button>
+                <button class="btn" id="fm-new-folder" title="New Folder">📁</button>
+                <button class="btn" id="fm-rename" title="Rename">✏️</button>
+                <button class="btn" id="fm-delete" title="Delete">🗑️</button>
+                <button class="btn" id="fm-popout" title="Pop out file manager into separate window">◳</button>
+            </div>
+            <div class="fm-content" id="fm-tree">
+            </div>
+        </div>
+
+    </div>
+
+    <div id="server-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <h3 style="font-weight: 500; font-size: 16px; color: var(--accent);">Server Connection</h3>
+            <input type="text" id="server-url" value="http://localhost:8080" placeholder="Server URL">
+            <button id="connect-btn" class="btn" style="background: var(--accent); color: #000; border:none; width: 100%; font-weight: bold;">Connect</button>
+            <button id="close-modal-btn" class="btn" style="width: 100%;">Cancel</button>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" accept=".svg" class="hidden">
+
+    <script>
+        let state = {
+            tool: 'brush',
+            currentColor: '#00d2ff',
+            strokeWidth: 3,
+            fontSize: 24,
+            panX: 0,
+            panY: 0,
+            zoom: 1,
+            isDrawing: false,
+            isPanning: false,
+            isTransforming: false,
+            isErasing: false,
+            transformMode: null,
+            startX: 0,
+            startY: 0,
+            lastMouseX: 0,
+            lastMouseY: 0,
+            history: [],
+            historyStep: -1,
+            selectedEl: null,
+            serverUrl: null,
+            currentFilePath: null,
+            selectedNodePath: null
+        };
+
+        const canvas = document.getElementById('canvas');
+        const container = document.getElementById('canvas-container');
+        const viewport = document.getElementById('viewport');
+        const svgLayer = document.getElementById('svg-layer');
+        const uiOverlay = document.getElementById('ui-overlay');
+
+        let currentDrawElement = null;
+
+        const bc = new BroadcastChannel('vector_canvas_sync_channel');
+
+        bc.onmessage = (event) => {
+            const msg = event.data;
+            if (!msg) return;
+            if (msg.type === 'SET_TOOL') {
+                setTool(msg.tool, true);
+            } else if (msg.type === 'SET_COLOR') {
+                state.currentColor = msg.color;
+            } else if (msg.type === 'UNDO') {
+                undo(true);
+            } else if (msg.type === 'REDO') {
+                redo(true);
+            } else if (msg.type === 'LOAD_FILE_CONTENT') {
+                svgLayer.innerHTML = msg.content;
+                saveHistory();
+            } else if (msg.type === 'REQUEST_STATE') {
+                bc.postMessage({ type: 'SYNC_STATE', state: state, svg: svgLayer.innerHTML });
+            }
+        };
+
+        function init() {
+            updateTransform();
+            saveHistory();
+        }
+
+        function updateTransform() {
+            viewport.setAttribute('transform', `matrix(${state.zoom}, 0, 0, ${state.zoom}, ${state.panX}, ${state.panY})`);
+            renderSelectionOverlay();
+        }
+
+        container.addEventListener('wheel', e => {
+            e.preventDefault();
+            const zoomFactor = e.deltaY < 0 ? 1.12 : 0.88;
+            const newZoom = Math.min(Math.max(0.02, state.zoom * zoomFactor), 200);
+
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            state.panX = mouseX - (mouseX - state.panX) * (newZoom / state.zoom);
+            state.panY = mouseY - (mouseY - state.panY) * (newZoom / state.zoom);
+            state.zoom = newZoom;
+
+            updateTransform();
+        }, { passive: false });
+
+        document.getElementById('center-btn').addEventListener('click', () => {
+            state.panX = 0;
+            state.panY = 0;
+            state.zoom = 1;
+            updateTransform();
+        });
+
+        function getSvgCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+            
+            return {
+                x: (clientX - rect.left - state.panX) / state.zoom,
+                y: (clientY - rect.top - state.panY) / state.zoom
+            };
+        }
+
+        function saveHistory() {
+            if (state.historyStep < state.history.length - 1) {
+                state.history = state.history.slice(0, state.historyStep + 1);
+            }
+            state.history.push(svgLayer.innerHTML);
+            state.historyStep++;
+            autoSave();
+        }
+
+        function undo(remote = false) {
+            if (state.historyStep > 0) {
+                state.historyStep--;
+                svgLayer.innerHTML = state.history[state.historyStep];
+                clearSelection();
+                autoSave();
+                if (!remote) bc.postMessage({ type: 'UNDO' });
+            }
+        }
+
+        function redo(remote = false) {
+            if (state.historyStep < state.history.length - 1) {
+                state.historyStep++;
+                svgLayer.innerHTML = state.history[state.historyStep];
+                clearSelection();
+                autoSave();
+                if (!remote) bc.postMessage({ type: 'REDO' });
+            }
+        }
+
+        document.getElementById('btn-undo').addEventListener('click', () => undo(false));
+        document.getElementById('btn-redo').addEventListener('click', () => redo(false));
+
+        function eraseElementAtPoint(clientX, clientY) {
+            const el = document.elementFromPoint(clientX, clientY);
+            if (el && el !== canvas && el !== container) {
+                let target = el;
+                while (target && target.parentNode !== svgLayer && target !== canvas) {
+                    target = target.parentNode;
+                }
+                if (target && target.parentNode === svgLayer) {
+                    target.remove();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        window.addEventListener('pointerdown', e => {
+            if (e.target.closest('#ui-layer')) return;
+            
+            if (e.button === 1 || state.tool === 'pan') {
+                state.isPanning = true;
+                state.lastMouseX = e.clientX;
+                state.lastMouseY = e.clientY;
+                container.style.cursor = 'grabbing';
+                return;
+            }
+
+            if (e.button !== 0) return;
+
+            const coords = getSvgCoords(e);
+            state.startX = coords.x;
+            state.startY = coords.y;
+
+            if (state.tool === 'eraser') {
+                state.isErasing = true;
+                if (eraseElementAtPoint(e.clientX, e.clientY)) {
+                    saveHistory();
+                }
+                return;
+            }
+
+            if (state.tool === 'fill') {
+                let el = document.elementFromPoint(e.clientX, e.clientY);
+                if (el && el !== canvas) {
+                    let target = el;
+                    while (target && target.parentNode !== svgLayer && target !== canvas) {
+                        target = target.parentNode;
+                    }
+                    if (target && target.parentNode === svgLayer) {
+                        if (target.tagName === 'path' && target.getAttribute('fill') === 'none') {
+                            target.setAttribute('stroke', state.currentColor);
+                        } else {
+                            target.setAttribute('fill', state.currentColor);
+                        }
+                        saveHistory();
+                    }
+                }
+                return;
+            }
+
+            if (state.tool === 'picker') {
+                let el = document.elementFromPoint(e.clientX, e.clientY);
+                if (el && el !== canvas) {
+                    let stroke = el.getAttribute('stroke');
+                    let fill = el.getAttribute('fill');
+                    let pickedColor = (stroke && stroke !== 'none') ? stroke : (fill && fill !== 'none' ? fill : state.currentColor);
+                    selectColorSlot(document.getElementById('slot-2'), pickedColor);
+                    setTool('brush');
+                }
+                return;
+            }
+
+            if (state.tool === 'select') {
+                if (e.target.classList.contains('transform-handle')) {
+                    state.isTransforming = true;
+                    state.transformMode = 'scale-rotate';
+                    return;
+                }
+
+                let target = e.target;
+                while (target && target.parentNode !== svgLayer && target !== canvas) {
+                    target = target.parentNode;
+                }
+
+                if (target && target.parentNode === svgLayer) {
+                    selectElement(target);
+                    state.isTransforming = true;
+                    state.transformMode = 'move';
+                    state.lastMouseX = coords.x;
+                    state.lastMouseY = coords.y;
+                } else {
+                    clearSelection();
+                }
+                return;
+            }
+
+            if (state.tool === 'text') {
+                let txt = prompt("Enter text:");
+                if (txt) {
+                    let textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    textEl.setAttribute('x', coords.x);
+                    textEl.setAttribute('y', coords.y);
+                    textEl.setAttribute('fill', state.currentColor);
+                    textEl.setAttribute('font-size', state.fontSize);
+                    textEl.setAttribute('font-family', 'sans-serif');
+                    textEl.textContent = txt;
+                    svgLayer.appendChild(textEl);
+                    saveHistory();
+                }
+                return;
+            }
+
+            state.isDrawing = true;
+            if (state.tool === 'brush') {
+                currentDrawElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                currentDrawElement.setAttribute('d', `M ${coords.x} ${coords.y}`);
+                currentDrawElement.setAttribute('stroke', state.currentColor);
+                currentDrawElement.setAttribute('fill', 'none');
+                currentDrawElement.setAttribute('stroke-width', state.strokeWidth);
+                currentDrawElement.setAttribute('stroke-linecap', 'round');
+                currentDrawElement.setAttribute('stroke-linejoin', 'round');
+                svgLayer.appendChild(currentDrawElement);
+            } else if (state.tool === 'line') {
+                currentDrawElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                currentDrawElement.setAttribute('x1', coords.x);
+                currentDrawElement.setAttribute('y1', coords.y);
+                currentDrawElement.setAttribute('x2', coords.x);
+                currentDrawElement.setAttribute('y2', coords.y);
+                currentDrawElement.setAttribute('stroke', state.currentColor);
+                currentDrawElement.setAttribute('stroke-width', state.strokeWidth);
+                currentDrawElement.setAttribute('stroke-linecap', 'round');
+                svgLayer.appendChild(currentDrawElement);
+            } else if (state.tool === 'circle') {
+                currentDrawElement = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                currentDrawElement.setAttribute('cx', coords.x);
+                currentDrawElement.setAttribute('cy', coords.y);
+                currentDrawElement.setAttribute('rx', '0');
+                currentDrawElement.setAttribute('ry', '0');
+                currentDrawElement.setAttribute('stroke', state.currentColor);
+                currentDrawElement.setAttribute('stroke-width', state.strokeWidth);
+                currentDrawElement.setAttribute('fill', 'none');
+                svgLayer.appendChild(currentDrawElement);
+            }
+        });
+
+        window.addEventListener('pointermove', e => {
+            if (state.isPanning) {
+                let dx = e.clientX - state.lastMouseX;
+                let dy = e.clientY - state.lastMouseY;
+                state.panX += dx;
+                state.panY += dy;
+                state.lastMouseX = e.clientX;
+                state.lastMouseY = e.clientY;
+                updateTransform();
+                return;
+            }
+
+            if (state.isErasing) {
+                eraseElementAtPoint(e.clientX, e.clientY);
+                return;
+            }
+
+            const coords = getSvgCoords(e);
+
+            if (state.isTransforming && state.selectedEl) {
+                if (state.transformMode === 'move') {
+                    let dx = coords.x - state.lastMouseX;
+                    let dy = coords.y - state.lastMouseY;
+                    let transform = state.selectedEl.getAttribute('transform') || '';
+                    
+                    if (state.selectedEl.tagName.toLowerCase() === 'image') {
+                        let x = parseFloat(state.selectedEl.getAttribute('x')) + dx;
+                        let y = parseFloat(state.selectedEl.getAttribute('y')) + dy;
+                        state.selectedEl.setAttribute('x', x);
+                        state.selectedEl.setAttribute('y', y);
+                    } else {
+                        let translateMatch = transform.match(/translate\(([^)]+)\)/);
+                        let tx = 0, ty = 0;
+                        if (translateMatch) {
+                            let parts = translateMatch[1].split(/[\s,]+/);
+                            tx = parseFloat(parts[0]) || 0;
+                            ty = parseFloat(parts[1]) || 0;
+                        }
+                        let newTransform = transform.replace(/translate\([^)]+\)/, '').trim();
+                        state.selectedEl.setAttribute('transform', `translate(${tx + dx}, ${ty + dy}) ${newTransform}`);
+                    }
+
+                    state.lastMouseX = coords.x;
+                    state.lastMouseY = coords.y;
+                    renderSelectionOverlay();
+                } else if (state.transformMode === 'scale-rotate') {
+                    let bbox = state.selectedEl.getBBox();
+                    let cx = bbox.x + bbox.width / 2;
+                    let cy = bbox.y + bbox.height / 2;
+                    let dx = coords.x - cx;
+                    let dy = coords.y - cy;
+                    let rad = Math.atan2(dy, dx);
+                    let deg = rad * (180 / Math.PI);
+
+                    if (e.shiftKey) deg = Math.round(deg / 45) * 45;
+
+                    let origDiag = Math.sqrt(Math.pow(bbox.width / 2, 2) + Math.pow(bbox.height / 2, 2));
+                    let curDiag = Math.sqrt(dx * dx + dy * dy);
+                    let scale = Math.max(0.1, curDiag / origDiag);
+
+                    state.selectedEl.setAttribute('transform', `translate(${cx}, ${cy}) rotate(${deg}) scale(${scale}) translate(${-cx}, ${-cy})`);
+                    renderSelectionOverlay();
+                }
+                return;
+            }
+
+            if (!state.isDrawing || !currentDrawElement) return;
+
+            let curX = coords.x;
+            let curY = coords.y;
+
+            if (e.shiftKey && (state.tool === 'brush' || state.tool === 'line')) {
+                let angle = Math.atan2(curY - state.startY, curX - state.startX) * (180 / Math.PI);
+                let absAngle = Math.abs(angle);
+                if (absAngle < 8 || absAngle > 172) curY = state.startY;
+                else if (Math.abs(absAngle - 90) < 8) curX = state.startX;
+            }
+
+            if (state.tool === 'brush') {
+                let d = currentDrawElement.getAttribute('d');
+                if (e.shiftKey) {
+                    currentDrawElement.setAttribute('d', `M ${state.startX} ${state.startY} L ${curX} ${curY}`);
+                } else {
+                    currentDrawElement.setAttribute('d', `${d} L ${curX} ${curY}`);
+                }
+            } else if (state.tool === 'line') {
+                currentDrawElement.setAttribute('x2', curX);
+                currentDrawElement.setAttribute('y2', curY);
+            } else if (state.tool === 'circle') {
+                let rx = Math.abs(curX - state.startX) / 2;
+                let ry = Math.abs(curY - state.startY) / 2;
+                if (e.shiftKey) rx = ry = Math.max(rx, ry);
+                let cx = state.startX + (curX >= state.startX ? rx : -rx);
+                let cy = state.startY + (curY >= state.startY ? ry : -ry);
+                currentDrawElement.setAttribute('cx', cx);
+                currentDrawElement.setAttribute('cy', cy);
+                currentDrawElement.setAttribute('rx', rx);
+                currentDrawElement.setAttribute('ry', ry);
+            }
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (state.isPanning) {
+                state.isPanning = false;
+                container.style.cursor = state.tool === 'pan' ? 'grab' : 'crosshair';
+            }
+            if (state.isErasing) {
+                state.isErasing = false;
+                saveHistory();
+            }
+            if (state.isDrawing) {
+                state.isDrawing = false;
+                currentDrawElement = null;
+                saveHistory();
+            }
+            if (state.isTransforming) {
+                state.isTransforming = false;
+                saveHistory();
+            }
+        });
+
+        function selectElement(el) {
+            state.selectedEl = el;
+            renderSelectionOverlay();
+        }
+
+        function clearSelection() {
+            state.selectedEl = null;
+            uiOverlay.innerHTML = '';
+        }
+
+        function renderSelectionOverlay() {
+            uiOverlay.innerHTML = '';
+            if (!state.selectedEl) return;
+
+            let bbox = state.selectedEl.getBBox();
+            let transform = state.selectedEl.getAttribute('transform') || '';
+
+            let g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('transform', transform);
+
+            let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', bbox.x - 4);
+            rect.setAttribute('y', bbox.y - 4);
+            rect.setAttribute('width', bbox.width + 8);
+            rect.setAttribute('height', bbox.height + 8);
+            rect.setAttribute('class', 'selection-overlay');
+
+            let handle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            handle.setAttribute('cx', bbox.x + bbox.width + 4);
+            handle.setAttribute('cy', bbox.y + bbox.height + 4);
+            handle.setAttribute('r', '6');
+            handle.setAttribute('class', 'transform-handle');
+
+            g.appendChild(rect);
+            g.appendChild(handle);
+            uiOverlay.appendChild(g);
+        }
+
+        function setTool(toolName, remote = false) {
+            state.tool = toolName;
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            let activeBtn = document.querySelector(`.tool-btn[data-tool="${toolName}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            if (toolName === 'pan') container.style.cursor = 'grab';
+            else if (toolName === 'select') container.style.cursor = 'default';
+            else if (toolName === 'eraser') container.style.cursor = 'cell';
+            else if (toolName === 'fill' || toolName === 'picker') container.style.cursor = 'copy';
+            else {
+                container.style.cursor = 'crosshair';
+                clearSelection();
+            }
+            if (!remote) {
+                bc.postMessage({ type: 'SET_TOOL', tool: toolName });
+            }
+        }
+
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                setTool(e.currentTarget.getAttribute('data-tool'), false);
+            });
+        });
+
+        function selectColorSlot(slotEl, color, remote = false) {
+            document.querySelectorAll('.color-slot').forEach(s => s.classList.remove('active'));
+            slotEl.classList.add('active');
+            state.currentColor = color;
+            if (!remote) {
+                bc.postMessage({ type: 'SET_COLOR', color: color });
+            }
+        }
+
+        document.getElementById('slot-1').onclick = () => selectColorSlot(document.getElementById('slot-1'), '#00d2ff', false);
+        document.getElementById('slot-2').onclick = () => selectColorSlot(document.getElementById('slot-2'), document.getElementById('slot-2').style.backgroundColor || '#ff0055', false);
+        
+        document.getElementById('color-picker-input').addEventListener('input', e => {
+            let col = e.target.value;
+            let slot2 = document.getElementById('slot-2');
+            slot2.style.backgroundColor = col;
+            slot2.style.color = col;
+            selectColorSlot(slot2, col, false);
+        });
+
+        function getBoundingBoxWithPadding(padding = 20) {
+            let bbox = svgLayer.getBBox();
+            if (bbox.width === 0 || bbox.height === 0) {
+                return { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight };
+            }
+            return {
+                x: bbox.x - padding,
+                y: bbox.y - padding,
+                width: bbox.width + padding * 2,
+                height: bbox.height + padding * 2
+            };
+        }
+
+        document.getElementById('export-svg').addEventListener('click', () => {
+            const svgData = new XMLSerializer().serializeToString(canvas);
+            const blob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'drawing.svg'; a.click(); URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('export-png').addEventListener('click', () => {
+            const bounds = getBoundingBoxWithPadding();
+            const svgData = `<svg xmlns="http://www.w3.org/2000/svg" width="${bounds.width}" height="${bounds.height}" viewBox="${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}">
+                <rect x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}" fill="${getComputedStyle(document.body).backgroundColor}"/>
+                ${svgLayer.innerHTML}
+            </svg>`;
+            const canvasImg = document.createElement('canvas');
+            canvasImg.width = bounds.width;
+            canvasImg.height = bounds.height;
+            const ctx = canvasImg.getContext('2d');
+            const img = new Image();
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                const a = document.createElement('a');
+                a.download = 'drawing.png';
+                a.href = canvasImg.toDataURL('image/png');
+                a.click();
+            };
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+        });
+
+        document.getElementById('import-btn').addEventListener('click', () => {
+            document.getElementById('file-input').click();
+        });
+
+        document.getElementById('file-input').addEventListener('change', e => {
+            let file = e.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = (f) => {
+                let parser = new DOMParser();
+                let doc = parser.parseFromString(f.target.result, "image/svg+xml");
+                let importedLayer = doc.getElementById('svg-layer') || doc.documentElement;
+                svgLayer.innerHTML = importedLayer.innerHTML;
+                saveHistory();
+            };
+            reader.readAsText(file);
+        });
+
+        window.addEventListener('paste', e => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (let item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const blob = item.getAsFile();
+                    let reader = new FileReader();
+                    reader.onload = (evt) => {
+                        let img = new Image();
+                        img.onload = () => {
+                            let svgImg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                            svgImg.setAttribute('href', evt.target.result);
+                            svgImg.setAttribute('x', 0);
+                            svgImg.setAttribute('y', 0);
+                            svgImg.setAttribute('width', Math.min(img.width, 400));
+                            svgImg.setAttribute('height', (img.height / img.width) * Math.min(img.width, 400));
+                            svgLayer.appendChild(svgImg);
+                            setTool('select');
+                            selectElement(svgImg);
+                            saveHistory();
+                        };
+                        img.src = evt.target.result;
+                    };
+                    reader.readAsDataURL(blob);
+                }
+            }
+        });
+
+        document.getElementById('popout-toolbar').addEventListener('click', () => {
+            const win = window.open('', '_blank', 'width=380,height=160,resizable=yes');
+            if (!win) {
+                alert("Please allow popups to use the Alt+Tab window mode!");
+                return;
+            }
+            win.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8"><title>Tools — Vector Canvas</title>
+                    <style>
+                        body { background: #000; color: #e0f7ff; font-family: sans-serif; padding: 15px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: center; }
+                        button { background: rgba(8,14,24,0.92); border: 1px solid rgba(0,210,255,0.35); color: #8ab4f8; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 16px; min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+                        button:hover { background: rgba(0,210,255,0.15); border-color: rgba(0,210,255,0.4); color: #00d2ff; }
+                        button.active { background: rgba(0,210,255,0.25); border-color: #00d2ff; color: #fff; }
+                    </style>
+                </head>
+                <body>
+                    <button onclick="setTool('brush')" id="b-brush" title="Brush">✏️</button>
+                    <button onclick="setTool('line')" id="b-line" title="Line">📏</button>
+                    <button onclick="setTool('circle')" id="b-circle" title="Circle">⭕</button>
+                    <button onclick="setTool('eraser')" id="b-eraser" title="Eraser">🧽</button>
+                    <button onclick="setTool('fill')" id="b-fill" title="Fill">🎨</button>
+                    <button onclick="setTool('text')" id="b-text" title="Text">T</button>
+                    <button onclick="setTool('select')" id="b-select" title="Selection">↖</button>
+                    <button onclick="setTool('pan')" id="b-pan" title="Pan">✋</button>
+                    <script>
+                        const bc = new BroadcastChannel('vector_canvas_sync_channel');
+                        function setTool(t) {
+                            bc.postMessage({ type: 'SET_TOOL', tool: t });
+                            document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                            document.getElementById('b-' + t)?.classList.add('active');
+                        }
+                        bc.onmessage = (e) => {
+                            if (e.data && e.data.type === 'SET_TOOL') {
+                                document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                                document.getElementById('b-' + e.data.tool)?.classList.add('active');
+                            }
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            win.document.close();
+        });
+
+        document.getElementById('fm-popout').addEventListener('click', () => {
+            const win = window.open('', '_blank', 'width=340,height=500,resizable=yes');
+            if (!win) {
+                alert("Please allow popups!");
+                return;
+            }
+            win.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8"><title>File Explorer — Vector Canvas</title>
+                    <style>
+                        body { background: #000; color: #e0f7ff; font-family: sans-serif; padding: 10px; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+                        .fm-toolbar { display: flex; gap: 5px; padding: 8px; border-bottom: 1px solid rgba(0,210,255,0.35); background: #04070d; border-radius: 6px; }
+                        button { background: #080e18; border: 1px solid rgba(0,210,255,0.35); color: #8ab4f8; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+                        button:hover { background: rgba(0,210,255,0.15); color: #00d2ff; }
+                        .fm-content { flex-grow: 1; overflow-y: auto; padding: 10px 5px; font-size: 13px; }
+                        details { padding-left: 10px; margin-top: 2px; }
+                        summary { cursor: pointer; padding: 4px; border-radius: 4px; list-style: none; display: flex; align-items: center; gap: 5px; }
+                        summary:hover, .file-item:hover { background: rgba(0,210,255,0.15); }
+                        .file-item { cursor: pointer; padding: 4px 4px 4px 25px; border-radius: 4px; margin-top: 2px; display: flex; align-items: center; gap: 5px; }
+                        .file-item.selected { background: rgba(0,210,255,0.3); color: #fff; }
+                    </style>
+                </head>
+                <body>
+                    <div class="fm-toolbar">
+                        <button onclick="refresh()">🔄 Refresh</button>
+                    </div>
+                    <div class="fm-content" id="tree-container">Loading files...</div>
+                    <script>
+                        const bc = new BroadcastChannel('vector_canvas_sync_channel');
+                        let serverUrl = "${state.serverUrl || ''}";
+                        
+                        async function refresh() {
+                            if (!serverUrl) {
+                                document.getElementById('tree-container').innerText = 'Server not connected in the main window.';
+                                return;
+                            }
+                            try {
+                                let res = await fetch(serverUrl + '/api/tree');
+                                let tree = await res.json();
+                                document.getElementById('tree-container').innerHTML = buildTreeHTML(tree);
+                                bindEvents();
+                            } catch(e) {
+                                document.getElementById('tree-container').innerText = 'Error loading tree.';
+                            }
+                        }
+
+                        function buildTreeHTML(nodes) {
+                            let html = "";
+                            for (let node of nodes) {
+                                if (node.type === 'folder') {
+                                    html += \`<details data-path="\${node.path}"><summary>📁 \${node.name}</summary><div>\${buildTreeHTML(node.children)}</div></details>\`;
+                                } else {
+                                    html += \`<div class="file-item" data-path="\${node.path}">📄 \${node.name}</div>\`;
+                                }
+                            }
+                            return html;
+                        }
+
+                        function bindEvents() {
+                            document.querySelectorAll('.file-item').forEach(el => {
+                                el.onclick = async () => {
+                                    document.querySelectorAll('.file-item').forEach(x => x.classList.remove('selected'));
+                                    el.classList.add('selected');
+                                    let path = el.getAttribute('data-path');
+                                    let res = await fetch(serverUrl + '/api/file?path=' + encodeURIComponent(path));
+                                    let text = await res.text();
+                                    try {
+                                        let json = JSON.parse(text);
+                                        text = json.content || json.data || text;
+                                    } catch(e){}
+                                    bc.postMessage({ type: 'LOAD_FILE_CONTENT', content: text, path: path });
+                                };
+                            });
+                        }
+                        refresh();
+                    <\/script>
+                </body>
+                </html>
+            `);
+            win.document.close();
+        });
+
+        const serverBtn = document.getElementById('server-btn');
+        const serverModal = document.getElementById('server-modal');
+        const fmPanel = document.getElementById('file-manager');
+        const fmTree = document.getElementById('fm-tree');
+
+        serverBtn.addEventListener('click', () => serverModal.classList.remove('hidden'));
+        document.getElementById('close-modal-btn').addEventListener('click', () => serverModal.classList.add('hidden'));
+        document.getElementById('close-fm').addEventListener('click', () => fmPanel.classList.add('hidden'));
+
+        document.getElementById('connect-btn').addEventListener('click', async () => {
+            let url = document.getElementById('server-url').value.replace(/\/$/, "");
+            try {
+                let res = await fetch(url + '/api/tree');
+                if (!res.ok) throw new Error("Server response not OK");
+                state.serverUrl = url;
+                serverBtn.style.color = 'var(--accent)';
+                serverModal.classList.add('hidden');
+                fmPanel.classList.remove('hidden');
+                refreshTree();
+            } catch (e) {
+                alert("Connection error: " + e.message);
+            }
+        });
+
+        async function apiCall(endpoint, method='GET', body=null) {
+            if (!state.serverUrl) return null;
+            let options = { method, headers: {} };
+            if (body) {
+                options.headers['Content-Type'] = 'application/json';
+                options.body = JSON.stringify(body);
+            }
+            let res = await fetch(state.serverUrl + endpoint, options);
+            if (!res.ok) {
+                let err = await res.text();
+                throw new Error(err);
+            }
+            let text = await res.text();
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                return text;
+            }
+        }
+
+        async function refreshTree() {
+            try {
+                let tree = await apiCall('/api/tree');
+                if (Array.isArray(tree)) {
+                    fmTree.innerHTML = buildTreeHTML(tree);
+                    bindTreeEvents();
+                }
+            } catch (e) {
+                console.error("Failed to load tree", e);
+            }
+        }
+
+        function buildTreeHTML(nodes) {
+            let html = "";
+            for (let node of nodes) {
+                if (node.type === 'folder') {
+                    html += `<details data-path="${node.path}">
+                                <summary>📁 ${node.name}</summary>
+                                <div class="folder-content">
+                                    ${buildTreeHTML(node.children || [])}
+                                </div>
+                             </details>`;
+                } else {
+                    html += `<div class="file-item" data-path="${node.path}">📄 ${node.name}</div>`;
+                }
+            }
+            return html;
+        }
+
+        function bindTreeEvents() {
+            document.querySelectorAll('.file-item, summary').forEach(el => {
+                el.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    document.querySelectorAll('.file-item, summary').forEach(x => x.classList.remove('selected'));
+                    el.classList.add('selected');
+                    
+                    let path = el.tagName === 'SUMMARY' ? el.parentElement.getAttribute('data-path') : el.getAttribute('data-path');
+                    state.selectedNodePath = path;
+
+                    if (el.classList.contains('file-item')) {
+                        state.currentFilePath = path;
+                        try {
+                            let responseData = await apiCall('/api/file?path=' + encodeURIComponent(path));
+                            let svgContent = "";
+                            if (typeof responseData === 'object' && responseData !== null) {
+                                svgContent = responseData.content || responseData.data || "";
+                            } else {
+                                svgContent = responseData;
+                            }
+                            
+                            try {
+                                let parsed = JSON.parse(svgContent);
+                                if (parsed && parsed.content) svgContent = parsed.content;
+                            } catch(err){}
+
+                            let parser = new DOMParser();
+                            let doc = parser.parseFromString(svgContent, "image/svg+xml");
+                            let importedLayer = doc.getElementById('svg-layer') || doc.documentElement;
+                            if (importedLayer) {
+                                svgLayer.innerHTML = importedLayer.innerHTML;
+                                saveHistory();
+                            }
+                        } catch (err) {
+                            console.error("Load file error", err);
+                        }
+                    }
+                });
+            });
+        }
+
+        async function autoSave() {
+            if (!state.serverUrl || !state.currentFilePath) return;
+            const fullSvgString = new XMLSerializer().serializeToString(canvas);
+            const payload = {
+                path: state.currentFilePath,
+                content: fullSvgString,
+                data: fullSvgString
+            };
+            try {
+                await apiCall('/api/file', 'POST', payload);
+            } catch (e) { 
+                console.error("Autosave failed", e); 
+            }
+        }
+
+        document.getElementById('fm-new-file').addEventListener('click', async () => {
+            let name = prompt("File name (with .svg):", "drawing.svg");
+            if (!name) return;
+            let path = getParentPath() + "/" + name;
+            path = path.replace(/^\//, '');
+            let initialSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><g id="svg-layer"></g></svg>`;
+            try {
+                await apiCall('/api/file', 'POST', { path: path, content: initialSvg, data: initialSvg });
+                state.currentFilePath = path;
+                svgLayer.innerHTML = '<g id="svg-layer"></g>';
+                refreshTree();
+            } catch(e) {
+                alert("Error creating file: " + e.message);
+            }
+        });
+
+        document.getElementById('fm-new-folder').addEventListener('click', async () => {
+            let name = prompt("Folder name:");
+            if (!name) return;
+            let path = getParentPath() + "/" + name;
+            path = path.replace(/^\//, '');
+            try {
+                await apiCall('/api/folder', 'POST', { path: path });
+                refreshTree();
+            } catch(e) {
+                alert("Error creating folder: " + e.message);
+            }
+        });
+
+        document.getElementById('fm-rename').addEventListener('click', async () => {
+            if (!state.selectedNodePath) return alert("Select a file or folder to rename");
+            let newName = prompt("New name:", state.selectedNodePath.split('/').pop());
+            if (!newName) return;
+            let dir = state.selectedNodePath.substring(0, state.selectedNodePath.lastIndexOf('/'));
+            let newPath = (dir ? dir + "/" : "") + newName;
+            try {
+                await apiCall('/api/rename', 'PUT', { old: state.selectedNodePath, new: newPath });
+                refreshTree();
+            } catch(e) {
+                alert("Error renaming: " + e.message);
+            }
+        });
+
+        document.getElementById('fm-delete').addEventListener('click', async () => {
+            if (!state.selectedNodePath) return alert("Select a file or folder to delete");
+            if (confirm("Are you sure you want to delete " + state.selectedNodePath + "?")) {
+                try {
+                    await apiCall('/api/delete?path=' + encodeURIComponent(state.selectedNodePath), 'DELETE');
+                    if (state.currentFilePath === state.selectedNodePath) {
+                        state.currentFilePath = null;
+                        svgLayer.innerHTML = "";
+                    }
+                    refreshTree();
+                } catch(e) {
+                    alert("Error deleting: " + e.message);
+                }
+            }
+        });
+
+        function getParentPath() {
+            if (!state.selectedNodePath) return "";
+            let el = `[data-path="${state.selectedNodePath}"]`;
+            let found = document.querySelector(el);
+            if (found && found.tagName === 'DETAILS') return state.selectedNodePath;
+            return state.selectedNodePath.substring(0, state.selectedNodePath.lastIndexOf('/')) || "";
+        }
+
+        init();
+    </script>
+</body>
+</html>
