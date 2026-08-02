@@ -62,3 +62,6 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
 * the 29th of july
   congrats! now i have a vector-paint! so basically its the main thing. now i need to make a million pannels in visual studio code's style <br>
   <img width="1280" height="530" alt="image" src="https://github.com/user-attachments/assets/89aaf2c8-89fb-4fad-a670-e46e1cb9e095" />
+
+* the 2nd of august
+  gosh i love portable version so much, still need to fix it on mobile and do optimization for cheap laptops. its definitely gonna be pretty funny to UNprivate this repo when it will be time for release version  
