@@ -65,3 +65,5 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
 
 * the 2nd of august
   gosh i love portable version so much, still need to fix it on mobile and do optimization for cheap laptops. its definitely gonna be pretty funny to UNprivate this repo when it will be time for release version  
+* the 8th of august
+  preparing a lot of update stuff for graphium, didnt complete them in the week before cuz of busy timeline
