@@ -69,3 +69,5 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
   preparing a lot of update stuff for graphium, didnt complete them in the week before cuz of busy timeline
 * the 9th of august
   preparing design, animations, pdf export and latex support + vector stylus notes into pages with LaTeX automatically
+* the 10th of august
+  fixing bugs, a ton of updates: LaTeX, pdf support; new menu and navigation, custom svg icons
