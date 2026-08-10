@@ -71,3 +71,4 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
   preparing design, animations, pdf export and latex support + vector stylus notes into pages with LaTeX automatically
 * the 10th of august
   fixing bugs, a ton of updates: LaTeX, pdf support; new menu and navigation, custom svg icons
+  [18:35] some test
