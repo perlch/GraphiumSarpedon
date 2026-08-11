@@ -78,6 +78,6 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
   <img width="960" height="434" alt="image" src="https://github.com/user-attachments/assets/d742ca8c-ea39-4d51-8b12-08b258860f2c" /> <br>
   <img width="960" height="435" alt="image" src="https://github.com/user-attachments/assets/e0f94f5c-e0d9-49d0-b8f2-a9a5cab631c6" /> <br>
   <img width="960" height="435" alt="image" src="https://github.com/user-attachments/assets/e7e81435-f924-4b15-a2aa-baa625de9840" /> <br>
-
+  [16:22] holy shi in future ill have to make good README pls no :sob:
 
 
