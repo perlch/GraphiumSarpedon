@@ -72,3 +72,12 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
 * the 10th of august
   fixing bugs, a ton of updates: LaTeX, pdf support; new menu and navigation, custom svg icons
   [18:35] some test
+* the 11th of august
+  there are actually a big amount of fixes and more-stuff to add in graphium right now afte my few updates. as a "dev diary" i should add some screens, so there goes a few screens of 0.0.3 version of graphium i called "Deltote deceptoria": <br>
+  <img width="1024" height="768" alt="image" src="https://github.com/user-attachments/assets/a3890bd0-c666-4f05-b5a9-b143de790e7c" /> <br>
+  <img width="960" height="434" alt="image" src="https://github.com/user-attachments/assets/d742ca8c-ea39-4d51-8b12-08b258860f2c" /> <br>
+  <img width="960" height="435" alt="image" src="https://github.com/user-attachments/assets/e0f94f5c-e0d9-49d0-b8f2-a9a5cab631c6" /> <br>
+  <img width="960" height="435" alt="image" src="https://github.com/user-attachments/assets/e7e81435-f924-4b15-a2aa-baa625de9840" /> <br>
+
+
+
