@@ -16,7 +16,7 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
 
 ## Project Structure
 
-* `vecmyself.html` — The main frontend application containing the infinite canvas interface, tools, and multi-window communication logic.
+* `index.html` — The main frontend application containing the infinite canvas interface, tools, and multi-window communication logic.
 * `server.py` — The Python backend server (`tkinter` + `http.server`) managing file operations (tree navigation, reading, writing, renaming, and deleting SVG files) with CORS enabled.
 
 ## Requirements
