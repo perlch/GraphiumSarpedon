@@ -85,4 +85,5 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
   so i need to do a big amount of notes today thats why im updtaing graphium hard today. btw i'll need to remove this diary somewhere else from maind readme, the commit's story would be fun to read <br> <img width="942" height="436" alt="image" src="https://github.com/user-attachments/assets/9bf5fdee-efc8-4b40-8fd3-af0c4c5b3537" />
 * the 14th of august
   naming my app in the name of butterflies was the COOLest idea <br>
-  <img width="424" height="321" alt="image" src="https://github.com/user-attachments/assets/efff7a02-e483-4a98-8d20-f45cc9613055" />
+  <img width="424" height="321" alt="image" src="https://github.com/user-attachments/assets/efff7a02-e483-4a98-8d20-f45cc9613055" /> <br>
+  so, im actually still need to fix that bug with moving of pictures. also im not sure about pdf export of slides, but i still belive it would be cool to convert hand-text to type-text
