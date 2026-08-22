@@ -87,3 +87,5 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
   naming my app in the name of butterflies was the COOLest idea <br>
   <img width="424" height="321" alt="image" src="https://github.com/user-attachments/assets/efff7a02-e483-4a98-8d20-f45cc9613055" /> <br>
   so, im actually still need to fix that bug with moving of pictures. also im not sure about pdf export of slides, but i still belive it would be cool to convert hand-text to type-text
+* the 22nd of august
+  preparing the v1.0.0 version of graphium, did a lot of work, cleared trash and added classes (instead of functions spam), preparing place for future api stuff and fixing instruments; working fast on logo, thinking of documentation and migration of graphium-dev diary. working hard, notes are great 
