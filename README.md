@@ -90,3 +90,5 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
 * the 22nd of august
   preparing the v1.0.0 version of graphium, did a lot of work, cleared trash and added classes (instead of functions spam), preparing place for future api stuff and fixing instruments; working fast on logo, thinking of documentation and migration of graphium-dev diary. working hard, notes are great
   [12:37] so there is a lot of new stuff, i killed all of the latex for maybe feature updates/libs/apps and instead add the second instuments bar with figures, calc and math builder. pretty neat feature and actually dope for notes! okay that's all of the blablabla now, after finishing the code of 1.0.0i have to create a main web page for it and also good doc. aargh 
+* the 23rd of august
+  <img width="1280" height="579" alt="image" src="https://github.com/user-attachments/assets/f767dffb-d1c5-4d9f-a41e-8f2ef21b6fe9" />
