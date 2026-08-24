@@ -92,3 +92,6 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
   [12:37] so there is a lot of new stuff, i killed all of the latex for maybe feature updates/libs/apps and instead add the second instuments bar with figures, calc and math builder. pretty neat feature and actually dope for notes! okay that's all of the blablabla now, after finishing the code of 1.0.0i have to create a main web page for it and also good doc. aargh 
 * the 23rd of august
   <img width="1280" height="579" alt="image" src="https://github.com/user-attachments/assets/f767dffb-d1c5-4d9f-a41e-8f2ef21b6fe9" />
+* the 24oth of august
+  developed logo <br>
+  <img width="730" height="718" alt="image" src="https://github.com/user-attachments/assets/86f14267-a047-41c7-a53c-3fda617fc338" />
