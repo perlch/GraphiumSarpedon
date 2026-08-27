@@ -95,3 +95,5 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
 * the 24oth of august
   developed logo <br>
   <img width="730" height="718" alt="image" src="https://github.com/user-attachments/assets/86f14267-a047-41c7-a53c-3fda617fc338" />
+* the 27th of august
+  today is a day - building first versions, .exe, .apk, moving devlog somewhere else probably to trash 
