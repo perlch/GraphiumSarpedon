@@ -99,3 +99,6 @@ An infinite SVG canvas and vector note-taking web application designed for stylu
   today is a day - building first versions, .exe, .apk, moving devlog somewhere else probably to trash 
 * the 28th of august
   first .exe build is done.
+  [12:41] graphium sarpedon, windows 11 <br>
+  <img width="313" height="250" alt="image" src="https://github.com/user-attachments/assets/74ccf595-944f-47b8-a912-b669b4d58d9b" />
+
