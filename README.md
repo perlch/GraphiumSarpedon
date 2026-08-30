@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="686" height="641" alt="graphium" src="https://github.com/user-attachments/assets/464f2d3c-1cd1-4705-96cd-aa3f4fc7b17d" />
+  <img width="343" height="321" alt="graphium_dark" src="https://github.com/user-attachments/assets/13fa6115-9c68-4ab0-b236-140eaf54d4f3" />
   <br>
   <em>Graphium Sarpedon</em>
 </div>
