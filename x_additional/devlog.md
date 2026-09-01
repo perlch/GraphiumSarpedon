@@ -66,3 +66,5 @@
   <img width="313" height="250" alt="image" src="https://github.com/user-attachments/assets/74ccf595-944f-47b8-a912-b669b4d58d9b" />
 * the 30th of august
   i did the .apk build, i did docs, now i need to structure all of that and make cool intro webpage. im really love that its gonna perfectly hit the start of autumn 
+* the 1st of september
+  the 2 days of the first graphium build, already got a lot of ideas and comments from other guys
