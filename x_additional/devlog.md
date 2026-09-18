@@ -68,3 +68,5 @@
   i did the .apk build, i did docs, now i need to structure all of that and make cool intro webpage. im really love that its gonna perfectly hit the start of autumn 
 * the 1st of september
   the 2 days of the first graphium build, already got a lot of ideas and comments from other guys
+* the 18th of september
+  graphium agamemnon now in development, taking ideas, making notes
